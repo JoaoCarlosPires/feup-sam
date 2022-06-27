@@ -125,7 +125,7 @@ def compress_video(video_full_path, output_file_name, target_size):
     # Reference: https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
     print("started")
 
-    filename,file_extension = os.path.splitext(file_path)
+    filename,file_extension = os.path.splitext(video_full_path)
     print("file extension: " , file_extension)
     file_extension = file_extension.replace('.','')
 
