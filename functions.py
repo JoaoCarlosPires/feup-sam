@@ -117,12 +117,18 @@ import os,ffmpeg
 
 
 '''
-This function takes a video file and compresses it to the target_size defined (target_size is in kb)
-if target_size = 0, function determines ideal min size
+This function takes a video file(mp4 or mov) and compresses it to the target_size defined (target_size is in kb)
+if target_size = 0, function determines ideal min size. output_file_name requires an extension
+If video bit rate < 1000, it will throw exception Bitrate is extremely low
 '''
 def compress_video(video_full_path, output_file_name, target_size):
     # Reference: https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
     print("started")
+
+    filename,file_extension = os.path.splitext(file_path)
+    print("file extension: " , file_extension)
+    file_extension = file_extension.replace('.','')
+
     min_audio_bitrate = 32000
     max_audio_bitrate = 256000
     
@@ -147,7 +153,7 @@ def compress_video(video_full_path, output_file_name, target_size):
     video_bitrate = target_total_bitrate - audio_bitrate
 
     i = ffmpeg.input(video_full_path)
-    ffmpeg.output(i, os.devnull,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 1, 'f': 'mp4'}).overwrite_output().run()
+    ffmpeg.output(i, os.devnull,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 1, 'f': file_extension}).overwrite_output().run()
     ffmpeg.output(i, output_file_name,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 2, 'c:a': 'aac', 'b:a': audio_bitrate}).overwrite_output().run()
     print("finished")
 
