@@ -30,6 +30,10 @@ match result:
     case "Unsuccess":
         error("Picture could not be compressed")
     case "No need to compress":
-        print("Picture already with less than file size limit.")
+        print("Picture already with less than file size limit")
     case "Error":
         error("Error")
+    case "Cancel":
+        print("Canceled by user")
+    case _:
+        error("Default error")

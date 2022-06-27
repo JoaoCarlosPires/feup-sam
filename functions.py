@@ -9,20 +9,45 @@ and should proceed with the corresponding compression rate / quality
 def get_platform(user_selection, image, file_name):
     match user_selection:
         case 1: #Facebook
-            return compress_image(image, file_name, 8000000)
+            valid_types = ["JPEG", "JPG", "PNG", "BMP", "GIF", "TIFF"]
+            return verify_compress(image, valid_types, file_name, 8000000)
         case 2: #Instagram
-            return compress_image(image, file_name, 8000000)
+            valid_types = ["JPEG", "JPG", "PNG", "BMP"]
+            return verify_compress(image, valid_types, file_name, 8000000)
         case 3: #Twitter
-            return compress_image(image, file_name, 5000000)
-            # ToDo: .GIF -> 15MB instead of 5MB
+            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+            return verify_compress(image, valid_types, file_name, 5000000, 1)
         case 4: #LinkedIn
-            return compress_image(image, file_name, 5000000)
+            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+            return verify_compress(image, valid_types, file_name, 5000000)
         case 5: #Discord
-            return compress_image(image, file_name, 8000000)
+            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+            return verify_compress(image, valid_types, file_name, 8000000)
         case 6: #Messenger
-            return compress_image(image, file_name, 25000000)
+            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+            return verify_compress(image, valid_types, file_name, 25000000)
         case _:
             return "Error"
+
+'''
+
+'''
+def verify_compress(image, valid_types, file_name, final_size, twitter=0):
+    if check_need_to_compress(image, file_name, final_size):
+        if check_image_type(file_name, valid_types) != "Valid":
+            new_extension = change_image_type(valid_types)
+            if new_extension == "Error":
+                return "Error"
+            elif new_extension == "Cancel":
+                return new_extension
+            else:
+                file_name = file_name.split(".")[0] + "." + new_extension
+        if "GIF" in file_name.upper() and twitter:
+            return compress_image(image, file_name, 15000000)
+        else:
+            return compress_image(image, file_name, final_size)
+    else:
+        return "No need to compress"
 
 '''
 This function returns the compressed and compressed & optimized file names
@@ -45,13 +70,9 @@ def print_file_info(file, file_path, display_text):
 
 '''
 This function compresses an image until it reaches the desired final_size.
-If the image size is already bellow the final_size, it's not compressed.
 The compression is limited until a quality of 50% (successfull in most of the cases).
 '''
 def compress_image(image, file_path, final_size):
-    image.save(file_path,optimize=True,quality=100)
-    if len(Image.open(file_path).fp.read()) <= final_size:
-        return "No need to compress"
     for i in range(95, 50, -5):
         image.save(file_path,optimize=True,quality=i)
         if len(Image.open(file_path).fp.read()) <= final_size:
@@ -59,9 +80,35 @@ def compress_image(image, file_path, final_size):
     return "Unsuccess"
 
 '''
+If the image size is already bellow the final_size, it's not compressed.
+'''
+def check_need_to_compress(image, file_path, final_size):
+    image.save(file_path,optimize=True,quality=100)
+    if len(Image.open(file_path).fp.read()) <= final_size:
+        return 0 #No need to compress
+    return 1
+
+'''
 This function checks if the file extension is in the list of valid types.
-If it isn't, then prompts the user to select the new format or to cancel.
 '''
 def check_image_type(file_name, valid_types):
-    return "ToDo"    
-    
+    extension = (file_name.split(".")[-1]).upper()
+    for type in valid_types:
+        if type == extension:
+            return "Valid"
+    return extension
+
+def change_image_type(valid_types):
+    print("The extension of the uploaded file is not valid in this platform. Do you want to convert it?\n")
+    i = 1
+    for type in valid_types:
+        print(str(i) + ". " + type + "\n")
+        i+=1
+    print(str(i) + ". Do not convert\n")
+    user_selection = int(input("Please select one option"))
+    if user_selection > len(valid_types) + 1 or user_selection <= 0 :
+        return "Error"
+    elif user_selection == len(valid_types) + 1:
+        return "Cancel"
+    else:
+        return valid_types[user_selection-1]
