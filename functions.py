@@ -5,6 +5,7 @@ PILLOW (PIL) documentation: https://pillow.readthedocs.io/en/stable/
 import os
 from hurry.filesize import size
 from PIL import Image
+import ffmpeg
 
 '''
 This function should receive a number from the frontend (once the user clicks on the platform icon)
@@ -13,7 +14,7 @@ and should proceed with the corresponding compression rate / quality
 def compress_by_platform(user_selection, image, file_name, original_file_name):
     match user_selection:
         case "Facebook": 
-            valid_types = ["JPEG", "JPG", "BMP", "GIF", "TIFF"]
+            valid_types = ["JPEG", "JPG", "PNG", "BMP", "GIF", "TIFF"]
             return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
         case "Instagram":
             valid_types = ["JPEG", "JPG", "PNG", "BMP"]
@@ -122,3 +123,55 @@ def change_image_type(valid_types):
         return valid_types[user_selection-1]
     '''
     return "JPG"
+
+'''
+This function takes a video file(mp4 or mov) and compresses it to the target_size defined (target_size is in kb)
+if target_size = 0, function determines ideal min size. output_file_name requires an extension
+If video bit rate < 1000, it will throw exception Bitrate is extremely low
+'''
+def compress_video(video_full_path, output_file_name, target_size):
+    # Reference: https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
+    print("started")
+
+    filename,file_extension = os.path.splitext(video_full_path)
+    print("file extension: " , file_extension)
+    file_extension = file_extension.replace('.','')
+
+    min_audio_bitrate = 32000
+    max_audio_bitrate = 256000
+    
+    probe = ffmpeg.probe(video_full_path)
+    # Video duration, in s.
+    duration = float(probe['format']['duration'])
+    # Audio bitrate, in bps.
+    audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
+    # Target total bitrate, in bps.
+    if target_size == 0:
+        target_size = get_best_min_size(video_full_path)
+    target_total_bitrate = (target_size * 1024 * 8) / (1.073741824 * duration)
+
+    # Target audio bitrate, in bps
+    if 10 * audio_bitrate > target_total_bitrate:
+        audio_bitrate = target_total_bitrate / 10
+        if audio_bitrate < min_audio_bitrate < target_total_bitrate:
+            audio_bitrate = min_audio_bitrate
+        elif audio_bitrate > max_audio_bitrate:
+            audio_bitrate = max_audio_bitrate
+    # Target video bitrate, in bps.
+    video_bitrate = target_total_bitrate - audio_bitrate
+
+    i = ffmpeg.input(video_full_path)
+    ffmpeg.output(i, os.devnull,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 1, 'f': file_extension}).overwrite_output().run()
+    ffmpeg.output(i, output_file_name,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 2, 'c:a': 'aac', 'b:a': audio_bitrate}).overwrite_output().run()
+    print("finished")
+
+'''
+This function returns the ideal min size of a video in kB
+'''
+def get_best_min_size(video_full_path):
+    probe = ffmpeg.probe(video_full_path)
+    # Video duration, in s.
+    duration = float(probe['format']['duration'])
+    ideal_size = (32000 + 100000) * (1.073741824 * duration) / (8 * 1024)
+    print("Ideal size (kb): " + str(ideal_size))
+    return ideal_size
