@@ -2,8 +2,8 @@ WindowManager:
     HomeScreen:
     PlatformScreen:
     FileSelection:
-    FileConversion:
-    FileDownload:
+    FileDownloadPicture:
+    FileDownloadVideo:
     Error:
 
 <HomeScreen>:
@@ -28,19 +28,14 @@ WindowManager:
                 app.root.current = "platform"
                 root.manager.transition.direction = "left"
 
-        Button:
-            id: compressaudio
-            text: "Compress Audio"
-            on_press:
-                app.on_press_homescreen_button(self)
-                app.root.current = "platform"
-                root.manager.transition.direction = "left"
-
 <PlatformScreen>:
     name: "platform"
 
     GridLayout:
         cols:1
+
+        Label:
+            text: "Please select the platform"
 
         GridLayout:
             cols:2
@@ -51,15 +46,30 @@ WindowManager:
                 on_press:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
-                    root.manager.transition.direction = "left"                
+                    root.manager.transition.direction = "left" 
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/facebook.png'
+                        size_hint_x: 1
+                                     
 
             Button:
                 id: instagram
-                text: "Instagram"
+                text: "Ig"
                 on_press:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
                     root.manager.transition.direction = "left"
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/instagram.png'
+                        size_hint_x: 1
 
         GridLayout:
             cols:2
@@ -71,6 +81,13 @@ WindowManager:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
                     root.manager.transition.direction = "left"
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/twitter.png'
+                        size_hint_x: 1
 
             Button:
                 id: linkedin
@@ -79,6 +96,13 @@ WindowManager:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
                     root.manager.transition.direction = "left"
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/linkedin.png'
+                        size_hint_x: 1
 
         GridLayout:
             cols:2
@@ -90,6 +114,14 @@ WindowManager:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
                     root.manager.transition.direction = "left"
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/discord.png'
+                        size_hint_x: 1
+                
 
             Button:
                 id: messenger
@@ -98,69 +130,159 @@ WindowManager:
                     app.on_press_platform_button(self)
                     app.root.current = "file"
                     root.manager.transition.direction = "left"
+                StackLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    orientation: 'lr-tb'
+                    Image:
+                        source: 'icons/messenger.png'
+                        size_hint_x: 1
 
 <FileSelection>:
     name: "file"
 
     FileChooserListView:
         id: filechooser
-        on_submit: 
-            root.manager.result = app.selected(filechooser.selection)
-            root.manager.compressed_picture = app.getCompressedFile()
-            root.manager.original_file = app.getOriginalFile()
-            root.manager.errorMessage = app.getErrorMessage()
-            app.root.current = "download" if root.manager.result == "Success" else "error"
+        on_submit:
+            result = app.selected(filechooser.selection)
+            app.root.current = "downloadvideo" if result == "Success" else "error"
             root.manager.transition.direction = "left"
 
-<FileConversion>:
-    name: "conversion"
 
-    Label:
-        text: 'Hello World'
-
-<FileDownload>:
+<FileDownloadPicture>:
     name: "download"
-
-    GridLayout:
-        cols: 2
-
-        GridLayout:
-            cols: 1
-            Image:    
-                source: root.manager.original_file
-                allow_stretch: True
-            Label:
-                text: "Original file"
     
+    BoxLayout:
+        orientation: 'vertical'
         GridLayout:
-            cols: 1
-            Image:    
-                source: root.manager.compressed_picture
-                allow_stretch: True
-            Label:
-                text: "Compressed file"
+            cols: 2
 
-    GridLayout:
-        cols: 1
-        Button:
-            id: downloadbutton
-            text: "Download Image"
-            on_press:
-                app.share(root.manager.compressed_picture)
-                
+            GridLayout:
+                cols: 1
+                Image:    
+                    source: root.manager.original_file
+                    allow_stretch: True
+                Label:
+                    text: "Original file"
+        
+            GridLayout:
+                cols: 1
+                Image:    
+                    source: root.manager.compressed_media
+                    allow_stretch: True
+                Label:
+                    text: "Compressed file"
+
+        Label:
+            id: download_folder
+            font_size: 20
+            markup: True
+            height: 30
+            size_hint_y: None
+            text: 'Compressed picture successfully downloaded. [ref=some][b][u][color=0000ff]Open folder.[/color][/u][/b][/ref]'
+            on_ref_press:
+                app.open_folder()
+
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+
+            Button:
+                text: "Return to Homepage"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.root.current = "home"
+                    root.manager.transition.direction = "right"
+
+            Button:
+                text: "Close Application"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.stop()
+
+<FileDownloadVideo>:
+    name: "downloadvideo"
+    
+    BoxLayout:
+        orientation: 'vertical'
+        GridLayout:
+            cols: 2
+
+            GridLayout:
+                cols: 1
+                Video:    
+                    source: root.manager.original_file
+                Label:
+                    text: "Original file"
+        
+            GridLayout:
+                cols: 1
+                Video:    
+                    source: root.manager.compressed_media
+                Label:
+                    text: "Compressed file"
+
+        Label:
+            id: download_folder
+            font_size: 20
+            markup: True
+            height: 30
+            size_hint_y: None
+            text: 'Compressed video successfully downloaded. [ref=some][b][u][color=0000ff]Open folder.[/color][/u][/b][/ref]'
+            on_ref_press:
+                app.open_folder()
+
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+
+            Button:
+                text: "Return to Homepage"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.root.current = "home"
+                    root.manager.transition.direction = "right"
+
+            Button:
+                text: "Close Application"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.stop()
+                     
 <Error>:
     name: "error"
 
-    BoxLayout:
+    GridLayout:
+        cols: 1
 
         Label:
-            text: root.manager.errorMessage
+            id: errorMessage
+            text: "Error"
 
-        Button:
-            text: "Go Back"
-            on_press:
-                app.root.current = "home"
-                root.manager.transition.direction = "right"
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            Button:
+                text: "Return to Homepage"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.root.current = "home"
+                    root.manager.transition.direction = "right"
 
-
-    
+            Button:
+                text: "Close Application"
+                size: 75, 50
+                size_hint_y: None
+                font_size: 12
+                on_press:
+                    app.stop()

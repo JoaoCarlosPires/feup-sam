@@ -11,28 +11,53 @@ import ffmpeg
 This function should receive a number from the frontend (once the user clicks on the platform icon)
 and should proceed with the corresponding compression rate / quality
 '''
-def compress_by_platform(user_selection, image, file_name, original_file_name):
-    match user_selection:
-        case "Facebook": 
-            valid_types = ["JPEG", "JPG", "PNG", "BMP", "GIF", "TIFF"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
-        case "Instagram":
-            valid_types = ["JPEG", "JPG", "PNG", "BMP"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
-        case "Twitter":
-            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 5000000, 1)
-        case "LinkedIn":
-            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 5000000)
-        case "Discord":
-            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
-        case "Messenger":
-            valid_types = ["JPEG", "JPG", "PNG", "GIF"]
-            return verify_compress(image, valid_types, file_name, original_file_name, 25000000)
-        case _:
-            return "Error"
+def compress_picture_platform(user_selection, image, file_name, original_file_name):
+    if user_selection == "Facebook": 
+        valid_types = ["JPEG", "JPG", "PNG", "BMP", "GIF", "TIFF"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
+    elif user_selection == "Ig": #Instagram
+        valid_types = ["JPEG", "JPG", "PNG", "BMP"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
+    elif user_selection == "Twitter":
+        valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 5000000, 1)
+    elif user_selection == "LinkedIn":
+        valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 5000000)
+    elif user_selection == "Discord":
+        valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 8000000)
+    elif user_selection == "Messenger":
+        valid_types = ["JPEG", "JPG", "PNG", "GIF"]
+        return verify_compress(image, valid_types, file_name, original_file_name, 25000000)
+    else:
+        return "Error"
+
+def compress_video_platform(user_selection, original_file_name, file_name):
+    if user_selection == "Facebook": 
+        return verify_video(file_name, original_file_name, 10000000000)
+    elif user_selection == "Ig": #Instagram
+        return verify_video(file_name, original_file_name, 100000000)
+    elif user_selection == "Twitter":
+        return verify_video(file_name, original_file_name, 512000000)
+    elif user_selection == "LinkedIn":
+        return verify_video(file_name, original_file_name, 5000000000)
+    elif user_selection == "Discord":
+        return verify_video(file_name, original_file_name, 8000000)
+    elif user_selection == "Messenger":
+        return verify_video(file_name, original_file_name, 25000000)
+    else:
+        return "Error"
+
+def verify_video(file_name, original_file_name, final_size):
+    extension = (file_name.split(".")[-1]).upper()
+    if extension != "MP4":
+        file_name = file_name.split(".")[0] + ".mp4"
+    file_stats = os.stat(original_file_name)
+    if file_stats.st_size <= final_size:
+        return "No need to compress"
+    return [file_name, compress_video(original_file_name, file_name, final_size)]
+    
 
 '''
 
@@ -131,8 +156,6 @@ If video bit rate < 1000, it will throw exception Bitrate is extremely low
 '''
 def compress_video(video_full_path, output_file_name, target_size):
     # Reference: https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
-    print("started")
-
     filename,file_extension = os.path.splitext(video_full_path)
     print("file extension: " , file_extension)
     file_extension = file_extension.replace('.','')
@@ -141,10 +164,12 @@ def compress_video(video_full_path, output_file_name, target_size):
     max_audio_bitrate = 256000
     
     probe = ffmpeg.probe(video_full_path)
+    
     # Video duration, in s.
     duration = float(probe['format']['duration'])
     # Audio bitrate, in bps.
     audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
+
     # Target total bitrate, in bps.
     if target_size == 0:
         target_size = get_best_min_size(video_full_path)
@@ -163,7 +188,7 @@ def compress_video(video_full_path, output_file_name, target_size):
     i = ffmpeg.input(video_full_path)
     ffmpeg.output(i, os.devnull,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 1, 'f': file_extension}).overwrite_output().run()
     ffmpeg.output(i, output_file_name,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 2, 'c:a': 'aac', 'b:a': audio_bitrate}).overwrite_output().run()
-    print("finished")
+    return "Success"
 
 '''
 This function returns the ideal min size of a video in kB
