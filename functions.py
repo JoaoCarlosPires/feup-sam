@@ -175,7 +175,6 @@ def compress_video(video_full_path, output_file_name, target_size):
     try:
         audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
     except:
-        print("NO AUDIO MOTHERFUCKER")
         no_audio = 1
         audio_bitrate = 0
         
