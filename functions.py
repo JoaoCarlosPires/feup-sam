@@ -6,6 +6,7 @@ import os
 from hurry.filesize import size
 from PIL import Image
 import ffmpeg
+import shutil
 
 '''
 This function should receive a number from the frontend (once the user clicks on the platform icon)
@@ -35,17 +36,17 @@ def compress_picture_platform(user_selection, image, file_name, original_file_na
 
 def compress_video_platform(user_selection, original_file_name, file_name):
     if user_selection == "Facebook": 
-        return verify_video(file_name, original_file_name, 10000000000)
+        return verify_video(file_name, original_file_name, 10000000)
     elif user_selection == "Ig": #Instagram
-        return verify_video(file_name, original_file_name, 100000000)
+        return verify_video(file_name, original_file_name, 100000)
     elif user_selection == "Twitter":
-        return verify_video(file_name, original_file_name, 512000000)
+        return verify_video(file_name, original_file_name, 512000)
     elif user_selection == "LinkedIn":
-        return verify_video(file_name, original_file_name, 5000000000)
+        return verify_video(file_name, original_file_name, 5000000)
     elif user_selection == "Discord":
-        return verify_video(file_name, original_file_name, 8000000)
+        return verify_video(file_name, original_file_name, 8000)
     elif user_selection == "Messenger":
-        return verify_video(file_name, original_file_name, 25000000)
+        return verify_video(file_name, original_file_name, 25000)
     else:
         return "Error"
 
@@ -155,9 +156,12 @@ if target_size = 0, function determines ideal min size. output_file_name require
 If video bit rate < 1000, it will throw exception Bitrate is extremely low
 '''
 def compress_video(video_full_path, output_file_name, target_size):
+    output_file_name = os.path.normpath(output_file_name)
+    output_file_name = output_file_name.split(os.sep)
+    
     # Reference: https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
     filename,file_extension = os.path.splitext(video_full_path)
-    print("file extension: " , file_extension)
+    #print("file extension: " , file_extension)
     file_extension = file_extension.replace('.','')
 
     min_audio_bitrate = 32000
@@ -168,7 +172,13 @@ def compress_video(video_full_path, output_file_name, target_size):
     # Video duration, in s.
     duration = float(probe['format']['duration'])
     # Audio bitrate, in bps.
-    audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
+    try:
+        audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
+    except:
+        print("NO AUDIO MOTHERFUCKER")
+        no_audio = 1
+        audio_bitrate = 0
+        
 
     # Target total bitrate, in bps.
     if target_size == 0:
@@ -176,18 +186,21 @@ def compress_video(video_full_path, output_file_name, target_size):
     target_total_bitrate = (target_size * 1024 * 8) / (1.073741824 * duration)
 
     # Target audio bitrate, in bps
-    if 10 * audio_bitrate > target_total_bitrate:
-        audio_bitrate = target_total_bitrate / 10
-        if audio_bitrate < min_audio_bitrate < target_total_bitrate:
-            audio_bitrate = min_audio_bitrate
-        elif audio_bitrate > max_audio_bitrate:
-            audio_bitrate = max_audio_bitrate
+    if(not no_audio):
+        if 10 * audio_bitrate > target_total_bitrate:
+            audio_bitrate = target_total_bitrate / 10
+            if audio_bitrate < min_audio_bitrate < target_total_bitrate:
+                audio_bitrate = min_audio_bitrate
+            elif audio_bitrate > max_audio_bitrate:
+                audio_bitrate = max_audio_bitrate
+    
     # Target video bitrate, in bps.
     video_bitrate = target_total_bitrate - audio_bitrate
 
     i = ffmpeg.input(video_full_path)
     ffmpeg.output(i, os.devnull,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 1, 'f': file_extension}).overwrite_output().run()
-    ffmpeg.output(i, output_file_name,**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 2, 'c:a': 'aac', 'b:a': audio_bitrate}).overwrite_output().run()
+    ffmpeg.output(i, output_file_name[1],**{'c:v': 'libx264', 'b:v': video_bitrate, 'pass': 2, 'c:a': 'aac', 'b:a': audio_bitrate}).overwrite_output().run()
+    shutil.move(output_file_name[1],os.path.join(output_file_name[0],output_file_name[1]))
     return "Success"
 
 '''
