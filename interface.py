@@ -12,6 +12,8 @@ from functions import *
 from PIL import Image
 from kivy.properties import StringProperty
 import os
+from os import startfile
+from kivy.core.window import Window
 
 media_type = ""
 platform = ""
@@ -117,7 +119,19 @@ class MyMainApp(App):
     def open_folder(self):
         folder = "./converted_media/"
         folder = os.path.realpath(folder)
-        os.startfile(folder)
+        startfile(folder)
+        
+    def open_compressed_video(self):
+        global compressed_filename
+        startfile(os.path.normpath(compressed_filename))
+    
+    def open_original_video(self):
+        global original_file_name
+        startfile(original_file_name)
+        
+    def on_stop(self):
+        Window.close()
+
         
 if __name__ == "__main__":
     MyMainApp().run()

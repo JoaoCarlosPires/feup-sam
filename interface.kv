@@ -30,123 +30,146 @@ WindowManager:
 
 <PlatformScreen>:
     name: "platform"
-
-    GridLayout:
-        cols:1
-
-        Label:
-            text: "Please select the platform"
+    
+    BoxLayout:
+        orientation: 'vertical'
 
         GridLayout:
-            cols:2
-
-            Button:
-                id: facebook
-                text: "Facebook"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left" 
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/facebook.png'
-                        size_hint_x: 1
-                                     
-
-            Button:
-                id: instagram
-                text: "Ig"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left"
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/instagram.png'
-                        size_hint_x: 1
-
-        GridLayout:
-            cols:2
-
-            Button:
-                id: twitter
-                text: "Twitter"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left"
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/twitter.png'
-                        size_hint_x: 1
-
-            Button:
-                id: linkedin
-                text: "LinkedIn"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left"
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/linkedin.png'
-                        size_hint_x: 1
-
-        GridLayout:
-            cols:2
-
-            Button:
-                id: discord
-                text: "Discord"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left"
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/discord.png'
-                        size_hint_x: 1
-                
-
-            Button:
-                id: messenger
-                text: "Messenger"
-                on_press:
-                    app.on_press_platform_button(self)
-                    app.root.current = "file"
-                    root.manager.transition.direction = "left"
-                StackLayout:
-                    pos: self.parent.pos
-                    size: self.parent.size
-                    orientation: 'lr-tb'
-                    Image:
-                        source: 'icons/messenger.png'
-                        size_hint_x: 1
+            cols:1
+    
+            Label:
+                text: "Please select the platform"
+    
+            GridLayout:
+                cols:2
+    
+                Button:
+                    id: facebook
+                    text: "Facebook"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left" 
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/facebook.png'
+                            size_hint_x: 1
+                                         
+    
+                Button:
+                    id: instagram
+                    text: "Ig"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left"
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/instagram.png'
+                            size_hint_x: 1
+    
+            GridLayout:
+                cols:2
+    
+                Button:
+                    id: twitter
+                    text: "Twitter"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left"
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/twitter.png'
+                            size_hint_x: 1
+    
+                Button:
+                    id: linkedin
+                    text: "LinkedIn"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left"
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/linkedin.png'
+                            size_hint_x: 1
+    
+            GridLayout:
+                cols:2
+    
+                Button:
+                    id: discord
+                    text: "Discord"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left"
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/discord.png'
+                            size_hint_x: 1
+                    
+    
+                Button:
+                    id: messenger
+                    text: "Messenger"
+                    on_press:
+                        app.on_press_platform_button(self)
+                        app.root.current = "file"
+                        root.manager.transition.direction = "left"
+                    StackLayout:
+                        pos: self.parent.pos
+                        size: self.parent.size
+                        orientation: 'lr-tb'
+                        Image:
+                            source: 'icons/messenger.png'
+                            size_hint_x: 1
+                            
+        Button:
+            text: "Go Back"
+            size: 75, 50
+            size_hint_y: None
+            font_size: 12
+            on_press:
+                app.root.current = "home"
+                root.manager.transition.direction = "right"
 
 <FileSelection>:
     name: "file"
 
-    FileChooserListView:
-        id: filechooser
-        on_submit:
-            result = app.selected(filechooser.selection)
-            app.root.current = "downloadvideo" if result == "Success" else "error"
-            root.manager.transition.direction = "left"
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            on_submit:
+                result = app.selected(filechooser.selection)
+                app.root.current = "downloadvideo" if result == "Success" else "error"
+                root.manager.transition.direction = "left"
+                
+        Button:
+            text: "Go Back"
+            size: 75, 50
+            size_hint_y: None
+            font_size: 12
+            on_press:
+                app.root.current = "platform"
+                root.manager.transition.direction = "right"
 
 
 <FileDownloadPicture>:
@@ -209,31 +232,30 @@ WindowManager:
     
     BoxLayout:
         orientation: 'vertical'
-        GridLayout:
-            cols: 2
-
-            GridLayout:
-                cols: 1
-                Video:    
-                    source: root.manager.original_file
-                    state: "play"
-                    allow_stretch: True
-                    loaded: True
-                Label:
-                    text: "Original file"
         
-            GridLayout:
-                cols: 1
-                Video:    
-                    source: root.manager.compressed_media
-                    state: "play"
-                    allow_stretch: True
-                    loaded: True
-                Label:
-                    text: "Compressed file"
+        Label:
+            font_size: 20
+            text_size:self.size
+            halign:'center'
+            valign:'middle'
+            markup: True
+            height: 30
+            text: 'Original video could not be displayed. [ref=some][b][u][color=0000ff]Open original video.[/color][/u][/b][/ref]'
+            on_ref_press:
+                app.open_original_video()
+    
+        Label:
+            font_size: 20
+            markup: True
+            height: 30
+            text_size:self.size
+            halign:'center'
+            valign:'middle'
+            text: 'Compressed video could not be displayed. [ref=some][b][u][color=0000ff]Open compressed video.[/color][/u][/b][/ref]'
+            on_ref_press:
+                app.open_compressed_video()
 
         Label:
-            id: download_folder
             font_size: 20
             markup: True
             height: 30
