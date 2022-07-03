@@ -174,6 +174,7 @@ def compress_video(video_full_path, output_file_name, target_size):
     # Audio bitrate, in bps.
     try:
         audio_bitrate = float(next((s for s in probe['streams'] if s['codec_type'] == 'audio'), None)['bit_rate'])
+        no_audio = 0
     except:
         no_audio = 1
         audio_bitrate = 0

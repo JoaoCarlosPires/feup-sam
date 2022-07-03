@@ -216,6 +216,9 @@ WindowManager:
                 cols: 1
                 Video:    
                     source: root.manager.original_file
+                    state: "play"
+                    allow_stretch: True
+                    loaded: True
                 Label:
                     text: "Original file"
         
@@ -223,6 +226,9 @@ WindowManager:
                 cols: 1
                 Video:    
                     source: root.manager.compressed_media
+                    state: "play"
+                    allow_stretch: True
+                    loaded: True
                 Label:
                     text: "Compressed file"
 

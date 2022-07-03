@@ -5,6 +5,8 @@ Tutorial on Kivy: https://realpython.com/mobile-app-kivy-python/
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
+from kivy.uix.video import Video
+from kivy.uix.videoplayer import VideoPlayer 
 from kivy.uix.screenmanager import ScreenManager, Screen
 from functions import *
 from PIL import Image
