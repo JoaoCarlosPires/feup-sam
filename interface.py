@@ -1,19 +1,17 @@
-'''
-Tutorial on Kivy: https://realpython.com/mobile-app-kivy-python/
-'''
-
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.widget import Widget
 from kivy.uix.video import Video
+from kivy.uix.widget import Widget
+from kivy.core.window import Window
+from kivy.properties import StringProperty
 from kivy.uix.videoplayer import VideoPlayer 
 from kivy.uix.screenmanager import ScreenManager, Screen
+
 from functions import *
-from PIL import Image
-from kivy.properties import StringProperty
+
 import os
+from PIL import Image
 from os import startfile
-from kivy.core.window import Window
 
 media_type = ""
 platform = ""
@@ -47,6 +45,7 @@ class WindowManager(ScreenManager):
     result = StringProperty('')
     original_file = StringProperty('')
 
+# Kivy builder that loads the interface defined in the .kv file
 kv = Builder.load_file("interface.kv")
 
 class MyMainApp(App):
@@ -70,7 +69,7 @@ class MyMainApp(App):
         original_file_name = file_name
 
         if media_type == "Compress Video":
-            print("converting video")
+            print("Converting video")
         else:
             original_file = Image.open(file_name)
             print_file_info(original_file, file_name, "Original")
@@ -91,9 +90,7 @@ class MyMainApp(App):
 
         if result == "Success":
             print("Successfully compressed")
-            if media_type == "Compress Video":
-                pass #ToDo
-            else:
+            if media_type == "Compress Images":
                 compressed = Image.open(compressed_filename)
                 print_file_info(compressed, compressed_filename, "Compressed")
             return "Success"
@@ -131,7 +128,10 @@ class MyMainApp(App):
         
     def on_stop(self):
         Window.close()
-
+        
+    def getmediatype(self):
+        global media_type
+        return media_type
         
 if __name__ == "__main__":
     MyMainApp().run()

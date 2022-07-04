@@ -3,14 +3,17 @@ PILLOW (PIL) documentation: https://pillow.readthedocs.io/en/stable/
 '''
 
 import os
-from hurry.filesize import size
-from PIL import Image
 import ffmpeg
 import shutil
+from PIL import Image
+from hurry.filesize import size
 
 '''
-This function should receive a number from the frontend (once the user clicks on the platform icon)
-and should proceed with the corresponding compression rate / quality
+This function receives the user selection (platform selected by the user),
+the original picture and its file name and the destination file name.
+
+Based on the user selection, it returns the result of the compression, 
+considering the file extension and the maximum final size.
 '''
 def compress_picture_platform(user_selection, image, file_name, original_file_name):
     if user_selection == "Facebook": 
@@ -34,6 +37,13 @@ def compress_picture_platform(user_selection, image, file_name, original_file_na
     else:
         return "Error"
 
+'''
+This function receives the user selection (platform selected by the user),
+the original video and its file name and the destination file name.
+
+Based on the user selection, it returns the result of the compression, 
+considering the file extension and the maximum final size.
+'''
 def compress_video_platform(user_selection, original_file_name, file_name):
     if user_selection == "Facebook": 
         return verify_video(file_name, original_file_name, 10000000)
@@ -50,28 +60,41 @@ def compress_video_platform(user_selection, original_file_name, file_name):
     else:
         return "Error"
 
+'''
+This function receives the original file name and the destination
+file name, as well as the desired final size.
+
+It then converts the video to MP4 in case it is not already in MP4.
+Then, it checks if there is the need to compress based on the video final size.
+If there is, then it returns the result of the compression and the destination
+file name.
+'''
 def verify_video(file_name, original_file_name, final_size):
     extension = (file_name.split(".")[-1]).upper()
     if extension != "MP4":
         file_name = file_name.split(".")[0] + ".mp4"
     file_stats = os.stat(original_file_name)
-    if file_stats.st_size <= final_size:
+    if file_stats.st_size <= (final_size*1000):
         return "No need to compress"
     return [file_name, compress_video(original_file_name, file_name, final_size)]
     
 
 '''
+This function receives the original file name, the destination
+file name, the original file, the list of valid types, the final size and
+a special flag for twitter.
 
+It starts by seeing if the extension of the original file is on the list
+of valid extensions. If it is not, it converts, by default, to JPG.
+
+Then, it checks if there is the need to compress based on the image final size.
+If there is, then it returns the result of the compression and the destination
+file name. Here, for the case of the platform being twitter, the final size
+is different if the file extension is GIF.
 '''
 def verify_compress(image, valid_types, file_name, original_file_name, final_size, twitter=0):
     if check_image_type(file_name, valid_types) != "Valid":
-        new_extension = change_image_type(valid_types)
-        if new_extension == "Error":
-            return "Error"
-        elif new_extension == "Cancel":
-            return new_extension
-        else:
-            file_name = file_name.split(".")[0] + "." + new_extension
+        file_name = file_name.split(".")[0] + ".jpg"
     
     if check_need_to_compress(original_file_name, final_size):    
         if "GIF" in file_name.upper() and twitter:
@@ -82,7 +105,7 @@ def verify_compress(image, valid_types, file_name, original_file_name, final_siz
         return "No need to compress"
 
 '''
-This function returns the compressed and compressed & optimized file names
+This function returns the compressed file path (including file name)
 '''
 def get_compressed_file_name(file_path):
     if "/" in file_path:
@@ -97,14 +120,16 @@ def get_compressed_file_name(file_path):
     return compressed_file 
 
 '''
-This function prints the file information: size in pixels and size in MB
+This function prints the picture information received as argument.
+
+Note: It prints the size in pixels (x, y) and in bytes.
 '''
 def print_file_info(file, file_path, display_text):
     print("Size of " + display_text + " picture: " + str(file.size[0]) + " X " + str(file.size[1]))
     print(display_text + " file size: " + str(size(os.path.getsize(file_path))) + " bytes")
 
 '''
-This function compresses an image until it reaches the desired final_size.
+This function compresses an image until it reaches the desired final size.
 The compression is limited until a quality of 50% (successfull in most of the cases).
 '''
 def compress_image(image, file_path, final_size):
@@ -115,7 +140,9 @@ def compress_image(image, file_path, final_size):
     return "Unsuccess"
 
 '''
-If the image size is already bellow the final_size, it's not compressed.
+This function checks if an image size is already below the desired one.
+
+If the image size is already bellow the final size, it's not compressed.
 '''
 def check_need_to_compress(file_path, final_size):
     if len(Image.open(file_path).fp.read()) <= final_size:
@@ -132,28 +159,14 @@ def check_image_type(file_name, valid_types):
             return "Valid"
     return extension
 
-def change_image_type(valid_types):
-    '''
-    print("The extension of the uploaded file is not valid in this platform. Do you want to convert it?\n")
-    i = 1
-    for type in valid_types:
-        print(str(i) + ". " + type + "\n")
-        i+=1
-    print(str(i) + ". Do not convert\n")
-    user_selection = int(input("Please select one option"))
-    if user_selection > len(valid_types) + 1 or user_selection <= 0 :
-        return "Error"
-    elif user_selection == len(valid_types) + 1:
-        return "Cancel"
-    else:
-        return valid_types[user_selection-1]
-    '''
-    return "JPG"
-
 '''
-This function takes a video file(mp4 or mov) and compresses it to the target_size defined (target_size is in kb)
-if target_size = 0, function determines ideal min size. output_file_name requires an extension
-If video bit rate < 1000, it will throw exception Bitrate is extremely low
+This function takes a video file (mp4 or mov) and compresses it to the target size defined (target size is in kb).
+
+If target size = 0, function determines ideal min size. 
+
+output_file_name requires an extension.
+
+If video bit rate < 1000, it will throw the exception: Bitrate is extremely low
 '''
 def compress_video(video_full_path, output_file_name, target_size):
     output_file_name = os.path.normpath(output_file_name)
@@ -179,7 +192,6 @@ def compress_video(video_full_path, output_file_name, target_size):
         no_audio = 1
         audio_bitrate = 0
         
-
     # Target total bitrate, in bps.
     if target_size == 0:
         target_size = get_best_min_size(video_full_path)

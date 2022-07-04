@@ -159,7 +159,11 @@ WindowManager:
             id: filechooser
             on_submit:
                 result = app.selected(filechooser.selection)
+                mediatype = app.getmediatype()
+                if mediatype == "Compress Video": \
                 app.root.current = "downloadvideo" if result == "Success" else "error"
+                else: \
+                app.root.current = "download" if result == "Success" else "error"
                 root.manager.transition.direction = "left"
                 
         Button:
