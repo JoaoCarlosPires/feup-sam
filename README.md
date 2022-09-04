@@ -1,53 +1,10 @@
 # feup-sam
+ 
+These project and labs were created during the **2nd semester** of the **1st year** of the **Master in Informatics and Computing Engineering**, in **Multimedia Services and Applications** curricular unity (FEUP).
 
-## Setup
+[SAM FEUP-Sigarra](https://sigarra.up.pt/feup/en/UCURR_GERAL.FICHA_UC_VIEW?pv_ocorrencia_id=486265 "Curricular Unity Homepage")
 
-To run this code, you need to install the following dependencies:
+## Team
 
-### Hurry Filesize
-
-```
-pip install hurry.filesize
-```
-
-### PIL (Pillow)
-
-```
-pip install Pillow
-```
-
-### FFMPEG
-
-```
-pip install ffmpeg-python
-```
-
-**Note:** In case the above command does not work, try the following:
-
-```
-conda install -c conda-forge ffmpeg
-```
-
-### Shutil
-
-```
-pip install pytest-shutil
-```
-
-### Kivy
-
-```
-pip install kivy[full]
-```
-
-## Run the code
-
-To run the code, run the following command in the root directory:
-
-```
-python interface.py
-```
-
-## Usage
-
-For more information about the usage, please consult the information available on the chapter 'User Manual' in the [Report](docs/report.pdf).
+- João Pires
+- Nuno Silva (project only)
